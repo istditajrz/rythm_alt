@@ -1,4 +1,4 @@
-import discord, re, os, json
+import discord, re, os, json, asyncio
 from discord.ext import commands, tasks
 from discord_slash import cog_ext, SlashCommandOptionType, SlashContext
 from discord_slash.client import SlashCommand
@@ -43,6 +43,7 @@ class yt(commands.Cog):
         })
         self.voice_client = None
         self.queue = []
+        self.delete = []
         self._play.start()
         
     
@@ -73,8 +74,8 @@ class yt(commands.Cog):
 
     @cog_ext.cog_slash(name='join', description="bring the bot to your vc")
     async def join(self, ctx: SlashContext):
-        self._join(ctx)
-        ctx.send("Joined!")
+        await self._join(ctx)
+        await ctx.send("Joined!")
 
     @cog_ext.cog_slash(
         name="play", 
@@ -88,10 +89,10 @@ class yt(commands.Cog):
             await self._join(ctx)
         if ctx.author not in self.voice_client.channel.members:
             return await ctx.send("You're not in the voice channel")
+        await ctx.defer()
         if re.match(self.URL_REGEX, song) is None:
             with self.ydl as ydl:
                 result = ydl.extract_info(f"ytsearch:{song}")
-        await ctx.defer()
         with self.ydl as ydl:
             result = ydl.extract_info(song)
         duration_to_play = sum([v[1] for v in self.queue])
@@ -103,7 +104,8 @@ class yt(commands.Cog):
                     executable="./ffmpeg.exe", 
                     before_options=("-guess_layout_max 0")
                 ),
-                result['duration']
+                result['duration'],
+                ".\\assets\\" + str(result['id']) + '.mp3'
             )
         )
 
@@ -130,10 +132,11 @@ class yt(commands.Cog):
 
     @tasks.loop(seconds=10)
     async def _play(self):
-        for file in os.listdir('.\\assets'):
+        for file in self.delete:
             try:
-                os.remove(".\\assets\\" + file)
-            except Exception as e:
+                os.remove(file)
+                self.delete.remove(file)
+            except PermissionError as e:
                 print(e)
         if len(self.queue) < 1:
             return
@@ -141,8 +144,11 @@ class yt(commands.Cog):
             self.queue.clear()
             return
         if not self.voice_client.is_playing():
-            self.voice_client.play(self.queue.pop(0)[0])
+            new = self.queue.pop(0)
+            self.voice_client.play(new[0])
             print('playing')
+            await asyncio.sleep(2)
+            self.delete.append(new[2])
 
 if __name__ == '__main__':
     bot = commands.Bot('@', intents=discord.Intents.all())
