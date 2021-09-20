@@ -90,11 +90,11 @@ class yt(commands.Cog):
         if ctx.author not in self.voice_client.channel.members:
             return await ctx.send("You're not in the voice channel")
         await ctx.defer()
-        if re.match(self.URL_REGEX, song) is None:
-            with self.ydl as ydl:
-                result = ydl.extract_info(f"ytsearch:{song}")
         with self.ydl as ydl:
-            result = ydl.extract_info(song)
+            if re.match(self.URL_REGEX, song) is None:
+                result = ydl.extract_info(f"ytsearch:{song}", extra_info={'--default-search': 'ytsearch'})['entries'][0]
+            else:
+                result = ydl.extract_info(song, extra_info={'--default-search': 'ytsearch'})
         duration_to_play = sum([v[1] for v in self.queue])
         pos_in_queue = len(self.queue)
         self.queue.append(
