@@ -48,11 +48,11 @@ class yt(commands.Cog):
         
     
     @staticmethod
-    def duration_formating(seconds: int) -> str:
-        l = [str(seconds // 60 // 60), str(seconds // 60), str(seconds % 60).zfill(2)]
-        if l[0] == '0':
-            l.pop(0)
-        return ":".join(l)
+    def duration_formating(s: int) -> str:
+        h = str((s // 60) // 60)
+        m = str((s // 60) % 60)
+        s = str(s % 60)
+        return "{}:{}:{}".format(h.zfill(2), m.zfill(2), s.zfill(2)) if h != '0' else "{}:{}".format(m.zfill(2), s.zfill(2))
 
     async def _join(self, ctx: SlashContext):
         if self.voice_client == None:
