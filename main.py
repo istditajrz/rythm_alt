@@ -52,7 +52,13 @@ class yt(commands.Cog):
         h = str((s // 60) // 60)
         m = str((s // 60) % 60)
         s = str(s % 60)
-        return "{}:{}:{}".format(h.zfill(2), m.zfill(2), s.zfill(2)) if h != '0' else "{}:{}".format(m.zfill(2), s.zfill(2))
+        return "{}:{}:{}".format(h.zfill(2), m.zfill(2), s.zfill(2)) if h != '0' else "{}:{}".format(m, s.zfill(2))
+
+
+    @staticmethod
+    def sanitize_text(s: str) -> str:
+        return s.replace('"', '\\"')
+
 
     async def _join(self, ctx: SlashContext):
         if self.voice_client == None:
@@ -115,9 +121,9 @@ class yt(commands.Cog):
                     self.EMBED_FORMAT.format(
                         author_icon = ctx.author.avatar_url,
                         author_icon_proxy = ctx.author.default_avatar_url,
-                        video_title = result['title'],
+                        video_title = self.sanitize_text(result['title']),
                         video_url = result['webpage_url'],
-                        channel = result['channel'],
+                        channel = self.sanitize_text(result['channel']),
                         duration = self.duration_formating(result['duration']),
                         time_until_play = self.duration_formating(duration_to_play),
                         pos_in_queue = pos_in_queue,
@@ -130,17 +136,17 @@ class yt(commands.Cog):
         )
         
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=5)
     async def _play(self):
         for file in self.delete:
             try:
                 os.remove(file)
                 self.delete.remove(file)
             except PermissionError as e:
-                print(e)
+                pass
         if len(self.queue) < 1:
             return
-        if self.voice_client is None:
+        if self.voice_client is None or not self.voice_client.is_connected():
             self.queue.clear()
             return
         if not self.voice_client.is_playing():
