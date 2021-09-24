@@ -84,7 +84,7 @@ class yt(commands.Cog):
         await ctx.send("Joined!")
 
        
-        @cog_ext.cog_slash(name='skip', description='skip the current song')
+    @cog_ext.cog_slash(name='skip', description='skip the current song')
     async def skip(self, ctx: SlashContext):
         if self.voice_client.is_playing():
             await self.voice_client.stop()
