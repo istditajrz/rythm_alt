@@ -78,19 +78,19 @@ class yt(commands.Cog):
         else:
             await ctx.send("already in a vc")
 
-    @cog_ext.cog_slash(name='join', description="bring the bot to your vc")
+    @cog_ext.cog_slash(name='join', description="bring the bot to your vc", guild_ids = json.load(open('./SECRETS'))['GUILDS'])
     async def join(self, ctx: SlashContext):
         await self._join(ctx)
         await ctx.send("Joined!")
 
        
-    @cog_ext.cog_slash(name='skip', description='skip the current song')
+    @cog_ext.cog_slash(name='skip', description='skip the current song',guild_ids = json.load(open('./SECRETS'))['GUILDS'])
     async def skip(self, ctx: SlashContext):
         if self.voice_client.is_playing():
             await self.voice_client.stop()
             await ctx.send('Skipped!')
 
-    @cog_ext.cog_slash(name='pause', description='pause play')
+    @cog_ext.cog_slash(name='pause', description='pause play', guild_ids = json.load(open('./SECRETS'))['GUILDS'])
     async def pause(self, ctx: SlashContext):
         if self.voice_client.is_playing():
             self._play.stop()
@@ -99,7 +99,7 @@ class yt(commands.Cog):
         else:
             await ctx.send('Not playing')
 
-    @cog_ext.cog_slash(name='resume', description='restart play')
+    @cog_ext.cog_slash(name='resume', description='restart play', guild_ids = json.load(open('./SECRETS'))['GUILDS'])
     async def resume(self, ctx: SlashContext):
         await self.voice_client.resume()
         while not self.voice_client.is_playing():
@@ -111,7 +111,8 @@ class yt(commands.Cog):
         description="Add a song to the queue",
         options=[
             create_option("song", "song (url) to add to queue", SlashCommandOptionType.STRING, True, None)
-        ]
+        ],
+        guild_ids = json.load(open('./SECRETS'))['GUILDS']
         )
     async def play(self, ctx: SlashContext, song: str) -> None:
         if self.voice_client == None:
@@ -187,3 +188,4 @@ if __name__ == '__main__':
     @bot.event
     async def on_ready():
         print(f'Logged in {bot.user!s} ({bot.user.id})')
+    bot.run(json.load(open('./SECRETS'))['TOKEN'])
