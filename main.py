@@ -83,6 +83,29 @@ class yt(commands.Cog):
         await self._join(ctx)
         await ctx.send("Joined!")
 
+       
+        @cog_ext.cog_slash(name='skip', description='skip the current song')
+    async def skip(self, ctx: SlashContext):
+        if self.voice_client.is_playing():
+            await self.voice_client.stop()
+            await ctx.send('Skipped!')
+
+    @cog_ext.cog_slash(name='pause', description='pause play')
+    async def pause(self, ctx: SlashContext):
+        if self.voice_client.is_playing():
+            self._play.stop()
+            await self.voice_client.pause()
+            await ctx.send('Paused!')
+        else:
+            await ctx.send('Not playing')
+
+    @cog_ext.cog_slash(name='resume', description='restart play')
+    async def resume(self, ctx: SlashContext):
+        await self.voice_client.resume()
+        while not self.voice_client.is_playing():
+            await asyncio.sleep(0.5)
+        self._play.restart()
+        
     @cog_ext.cog_slash(
         name="play", 
         description="Add a song to the queue",
