@@ -1,4 +1,4 @@
-import discord, re, os, json, asyncio
+import discord, re, os, json, asyncio, requests
 from discord.ext import commands, tasks
 from discord_slash import cog_ext, SlashCommandOptionType, SlashContext
 from discord_slash.client import SlashCommand
@@ -29,6 +29,8 @@ class yt(commands.Cog):
     }},
     'type': 'rich'
     }}""".replace('\'', '\"').replace('\n', '').replace(" " * 4, " ")
+
+    GENIUS = "https://api.genius.com/"
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -87,21 +89,21 @@ class yt(commands.Cog):
     @cog_ext.cog_slash(name='skip', description='skip the current song',guild_ids = json.load(open('./SECRETS'))['GUILDS'])
     async def skip(self, ctx: SlashContext):
         if self.voice_client.is_playing():
-            await self.voice_client.stop()
+            self.voice_client.stop()
             await ctx.send('Skipped!')
 
     @cog_ext.cog_slash(name='pause', description='pause play', guild_ids = json.load(open('./SECRETS'))['GUILDS'])
     async def pause(self, ctx: SlashContext):
         if self.voice_client.is_playing():
             self._play.stop()
-            await self.voice_client.pause()
+            self.voice_client.pause()
             await ctx.send('Paused!')
         else:
             await ctx.send('Not playing')
 
     @cog_ext.cog_slash(name='resume', description='restart play', guild_ids = json.load(open('./SECRETS'))['GUILDS'])
     async def resume(self, ctx: SlashContext):
-        await self.voice_client.resume()
+        self.voice_client.resume()
         while not self.voice_client.is_playing():
             await asyncio.sleep(0.5)
         self._play.restart()
