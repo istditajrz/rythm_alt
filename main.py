@@ -1,4 +1,4 @@
-import discord, re, os, json, asyncio, requests
+import discord, re, os, json, asyncio #, requests
 from discord.ext import commands, tasks
 from discord_slash import cog_ext, SlashCommandOptionType, SlashContext
 from discord_slash.client import SlashCommand
