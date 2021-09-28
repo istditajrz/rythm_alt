@@ -41,7 +41,7 @@ class yt(commands.Cog):
                 'preferredcodec': 'mp3',
                 'preferredquality': '192',
             }],
-            "outtmpl" : '.\\assets\\%(id)s.%(ext)s'
+            "outtmpl" : './assets/%(id)s.%(ext)s'
         })
         self.voice_client = None
         self.queue = []
