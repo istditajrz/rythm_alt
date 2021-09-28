@@ -132,12 +132,12 @@ class yt(commands.Cog):
         self.queue.append(
             (
                 discord.FFmpegPCMAudio(
-                    ".\\assets\\" + str(result['id']) + '.mp3', 
-                    executable="./ffmpeg.exe", 
+                    "./assets/" + str(result['id']) + '.mp3', 
+                    executable="ffmpeg", 
                     before_options=("-guess_layout_max 0")
                 ),
                 result['duration'],
-                ".\\assets\\" + str(result['id']) + '.mp3'
+                "./assets/" + str(result['id']) + '.mp3'
             )
         )
 
